@@ -72,16 +72,16 @@ int main(int argc, char *argv[])
       // Write message
       n = write(sockfd,buffer,strlen(buffer));
       if (n < 0) 
-      error("ERROR writing to socket");
+        error("ERROR writing to socket");
       // Clear buffer
       bzero(buffer,256);
       // Read message
       n = read(sockfd,buffer,255);
       if (n < 0) 
-     error("ERROR reading from socket");
+       error("ERROR reading from socket");
       //Print response
-      printf("From server: %s\n",buffer);
-    }while(digit_test(buffer));
+     printf("From server: %s\n",buffer);
+   }while(digit_test(buffer));
 
     close(sockfd);
     return 0;
