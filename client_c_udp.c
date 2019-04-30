@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
    bzero(buffer,256);
    n = recvfrom(sock,buffer,256,0,(struct sockaddr *)&from, &length);
    if (n < 0) error("recvfrom");
+   
+   char *error_message = "Sorry, cannot compute!";
    if (strcmp(buffer, error_message) == 0)
         printf("%s\n", buffer);
    else{
@@ -64,7 +66,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   
+
    close(sock);
    return 0;
 }
