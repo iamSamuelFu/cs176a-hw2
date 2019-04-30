@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         n = recv(newsockfd,buffer,255,0);
      	if (n < 0) error("ERROR reading from socket");
        //printf("n = %d\n", n);
-       for( int i = 0; i < n - 1; i++){
+        for( int i = 0; i < n - 1; i++){
 			if(buffer[i] < '0' || buffer[i] > '9'){
 				send(newsockfd,"Sorry, cannot compute!" , strlen("Sorry, cannot compute!"),0);
 				sum = -1;

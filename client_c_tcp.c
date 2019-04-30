@@ -25,11 +25,10 @@ int digit_test(const char *msg){
       }else{
   return 1;
       }
-    }else if(msg[i] < '0'|| msg[i] > '9'){
+    }else if(msg[i] < '0'|| msg[i] > '9'){//not a digit
       return 0;
     }
   }
-  
   return 1;
 }
 
@@ -67,15 +66,22 @@ int main(int argc, char *argv[])
     bzero(buffer,256);
     fgets(buffer,256,stdin);
 
+    char *error_message = "Sorry, cannot compute!";
+
     do{
-     n=sendto(sock,buffer,
-        strlen(buffer),0,(const struct sockaddr *)&server,length);
-     if (n < 0) error("Sendto");
-     bzero(buffer,256);
-     n = recvfrom(sock,buffer,256,0,(struct sockaddr *)&from, &length);
-     if (n < 0) error("recvfrom");
-     printf("From server: %s\n", buffer);
-   }while(digit_test(buffer));
+      // Write message
+      n = write(sockfd,buffer,strlen(buffer));
+      if (n < 0) 
+      error("ERROR writing to socket");
+      // Clear buffer
+      bzero(buffer,256);
+      // Read message
+      n = read(sockfd,buffer,255);
+      if (n < 0) 
+     error("ERROR reading from socket");
+      //Print response
+      printf("From server: %s\n",buffer);
+    }while(digit_test(buffer));
 
     close(sockfd);
     return 0;
