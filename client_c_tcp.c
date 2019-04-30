@@ -67,22 +67,15 @@ int main(int argc, char *argv[])
     bzero(buffer,256);
     fgets(buffer,256,stdin);
 
-    char *error_message = "Sorry, cannot compute!";
-
     do{
-      // Write message
-      n = write(sockfd,buffer,strlen(buffer));
-      if (n < 0) 
-  error("ERROR writing to socket");
-      // Clear buffer
-      bzero(buffer,256);
-      // Read message
-      n = read(sockfd,buffer,255);
-      if (n < 0) 
-  error("ERROR reading from socket");
-      //Print response
-      printf("From server: %s\n",buffer);
-    }while(digit_test(buffer));
+     n=sendto(sock,buffer,
+        strlen(buffer),0,(const struct sockaddr *)&server,length);
+     if (n < 0) error("Sendto");
+     bzero(buffer,256);
+     n = recvfrom(sock,buffer,256,0,(struct sockaddr *)&from, &length);
+     if (n < 0) error("recvfrom");
+     printf("From server: %s\n", buffer);
+   }while(digit_test(buffer));
 
     close(sockfd);
     return 0;
