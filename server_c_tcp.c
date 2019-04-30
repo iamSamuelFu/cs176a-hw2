@@ -1,107 +1,93 @@
-// Cited code from http://www.linuxhowtos.org/data/6/server.c
-// It seems the code may have been written by Sasha Nitsch, although it is unclear
-// Cited code is marked below, mostly to set up the basic parts of the tcp server
-
-/* START CITED CODE */
-
-/* A simple server in the internet domain using TCP
-   The port number is passed as an argument */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <netdb.h> 
+#include <netinet/in.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include <sys/socket.h> 
 #include <sys/types.h> 
-#include <sys/socket.h>
-#include <netinet/in.h>
+#define MAX 128 
+#define PORT 32000 
+#define SA struct sockaddr 
 
-void error(const char *msg)
-{
-    perror(msg);
-    exit(1);
-}
+// Function designed for chat between client and server. 
+void func(int sockfd) 
+{ 
+  char buff[MAX]; 
+  int n; 
+    // infinite loop for chat 
+  for (;;) { 
+    bzero(buff, MAX); 
+    
+        // read the message from client and copy it in buffer 
+    read(sockfd, buff, sizeof(buff)); 
+        // print buffer which contains the client contents 
+    printf("From client: %s\t To client : ", buff); 
+    bzero(buff, MAX); 
+    n = 0; 
+        // copy server message in the buffer 
+    while ((buff[n++] = getchar()) != '\n') 
+      ; 
+    
+        // and send that buffer to client 
+    write(sockfd, buff, sizeof(buff)); 
+    
+        // if msg contains "Exit" then server exit and chat ended. 
+    if (strncmp("exit", buff, 4) == 0) { 
+      printf("Server Exit...\n"); 
+      break; 
+    } 
+  } 
+} 
 
-/* END CITED CODE */
-
-int isNum(const char *msg){
-  for(int i = 0; i < 256; i++){
-    if(msg[i] == 10 || msg[i] == 0){//end of string characters
-      if(i == 0){//empty string
-	return 0;
-      }else{//end of string
-	return 1;
-      }
-    }else if(msg[i] < '0' || msg[i] > '9'){//not a digit
-      return 0;
-    }
-  }
-  //should not happen but just in case
-  return 1;
-}
-
-int addDigits(char *msg){
-  int sum = 0;
-  //add digits
-  for(int i = 0; i < 256; i++){
-    if(msg[i] == 10 || msg[i] == 0){ //end of string character
-      break;
-    }
-    sum += msg[i] - '0';
-  }
-      
-  return sum;
-}
-
-/* START CITED CODE */
-
-int main(int argc, char *argv[])
-{
-     int sockfd, newsockfd, portno;
-     socklen_t clilen;
-     char buffer[256];
-     struct sockaddr_in serv_addr, cli_addr;
-     int n;
-     if (argc < 2) {
-         fprintf(stderr,"ERROR, no port provided\n");
-         exit(1);
-     }
-     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-     if (sockfd < 0) 
-        error("ERROR opening socket");
-     bzero((char *) &serv_addr, sizeof(serv_addr));
-     portno = atoi(argv[1]);
-     serv_addr.sin_family = AF_INET;
-     serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(portno);
-     if (bind(sockfd, (struct sockaddr *) &serv_addr,
-              sizeof(serv_addr)) < 0) 
-              error("ERROR on binding");
-     listen(sockfd,5);
-     clilen = sizeof(cli_addr);
-     newsockfd = accept(sockfd, 
-                 (struct sockaddr *) &cli_addr, 
-                 &clilen);
-     if (newsockfd < 0) 
-          error("ERROR on accept");
-     /*END CITED CODE */
-     int done = 0;
-     do{
-       bzero(buffer,256);
-       n = read(newsockfd,buffer,255);
-       if (n < 0) error("ERROR reading from socket");
-       if(isNum(buffer)){
-	 int sum = addDigits(buffer);
-	 sprintf(buffer, "%d",sum);
-	 n = write(newsockfd, buffer, strlen(buffer));
-	 if(sum < 10){
-	   done = 1;
-	 }
-       }else{
-	 n = write(newsockfd, "Sorry, cannot compute!",22);
-	 done = 1;
-       }
-       if (n < 0) error("ERROR writing to socket");
-     }while(!done);
-     close(newsockfd);
-     close(sockfd);
-     return 0; 
+// Driver function 
+int main() 
+{ 
+  int sockfd, connfd, len; 
+  struct sockaddr_in servaddr, cli; 
+  
+    // socket create and verification 
+  sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+  if (sockfd == -1) { 
+    printf("socket creation failed...\n"); 
+    exit(0); 
+  } 
+  else
+    printf("Socket successfully created..\n"); 
+  bzero(&servaddr, sizeof(servaddr)); 
+  
+    // assign IP, PORT 
+  servaddr.sin_family = AF_INET; 
+  servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
+  servaddr.sin_port = htons(PORT); 
+  
+    // Binding newly created socket to given IP and verification 
+  if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) { 
+    printf("socket bind failed...\n"); 
+    exit(0); 
+  } 
+  else
+    printf("Socket successfully binded..\n"); 
+  
+    // Now server is ready to listen and verification 
+  if ((listen(sockfd, 5)) != 0) { 
+    printf("Listen failed...\n"); 
+    exit(0); 
+  } 
+  else
+    printf("Server listening..\n"); 
+  len = sizeof(cli); 
+  
+    // Accept the data packet from client and verification 
+  connfd = accept(sockfd, (SA*)&cli, &len); 
+  if (connfd < 0) { 
+    printf("server acccept failed...\n"); 
+    exit(0); 
+  } 
+  else
+    printf("server acccept the client...\n"); 
+  
+    // Function for chatting between client and server 
+  func(connfd); 
+  
+    // After chatting close the socket 
+  close(sockfd); 
 }
