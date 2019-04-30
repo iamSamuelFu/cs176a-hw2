@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
        for( int i = 0; i < n - 1; i++){
 			if(buf[i] < '0' || buf[i] > '9'){
 				//printf("ERROR OCCUR\n");
-				sendto(sock, "From server: Sorry, cannot compute!" , strlen("From server: Sorry, cannot compute!"), 0, (struct sockaddr *)&from,fromlen);
+				sendto(sock, "Sorry, cannot compute!" , strlen("Sorry, cannot compute!"), 0, (struct sockaddr *)&from,fromlen);
 				sum = -1;
 				break;
 			}

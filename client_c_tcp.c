@@ -17,6 +17,22 @@ void error(const char *msg)
     exit(0);
 }
 
+int digit_test(const char *msg){
+  for(int i = 0; i < 256; i++){
+    if(msg[i] == 0){
+      if(i < 2){
+  return 0;
+      }else{
+  return 1;
+      }
+    }else if(msg[i] < '0'|| msg[i] > '9'){
+      return 0;
+    }
+  }
+  
+  return 1;
+}
+
 int main(int argc, char *argv[])
 {
     int sockfd, portno, n;
@@ -51,27 +67,22 @@ int main(int argc, char *argv[])
     bzero(buffer,256);
     fgets(buffer,256,stdin);
 
-    n = send(sockfd,buffer,strlen(buffer),0);
-    if (n < 0)
-         error("ERROR writing to socket");
-    bzero(buffer,256);
-    n = recv(sockfd,buffer,256,0);
-    if (n < 0)
-         error("ERROR reading from socket");
-
     char *error_message = "Sorry, cannot compute!";
 
-    if (strcmp(buffer, error_message) == 0)
-        printf("%s\n", buffer);
-    else{
-        while(atoi(buffer) > 0){
-            printf("From server: ");
-            printf("%s\n", buffer);
-            if(buffer[0] == 'S'){break;}
-            bzero(buffer,256);
-            recv(sockfd,buffer,256,0);
-        }
-    }
+    do{
+      // Write message
+      n = write(sockfd,buffer,strlen(buffer));
+      if (n < 0) 
+  error("ERROR writing to socket");
+      // Clear buffer
+      bzero(buffer,256);
+      // Read message
+      n = read(sockfd,buffer,255);
+      if (n < 0) 
+  error("ERROR reading from socket");
+      //Print response
+      printf("From server: %s\n",buffer);
+    }while(digit_test(buffer));
 
     close(sockfd);
     return 0;

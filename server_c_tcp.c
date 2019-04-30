@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
        //printf("n = %d\n", n);
        for( int i = 0; i < n - 1; i++){
 			if(buffer[i] < '0' || buffer[i] > '9'){
-				send(newsockfd,"From server: Sorry, cannot compute!" , strlen("From server: Sorry, cannot compute!"),0);
+				send(newsockfd,"Sorry, cannot compute!" , strlen("Sorry, cannot compute!"),0);
 				sum = -1;
 				break;
 			}
