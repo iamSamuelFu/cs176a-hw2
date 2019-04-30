@@ -5,7 +5,6 @@
 #include <sys/socket.h> 
 #include <sys/types.h> 
 #define MAX 128 
-#define PORT 32000 
 #define SA struct sockaddr 
 
 // Function designed for chat between client and server. 
@@ -57,7 +56,7 @@ int main()
     // assign IP, PORT 
   servaddr.sin_family = AF_INET; 
   servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
-  servaddr.sin_port = htons(PORT); 
+  servaddr.sin_port = htons(atoi(argv[1])); 
   
     // Binding newly created socket to given IP and verification 
   if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) { 

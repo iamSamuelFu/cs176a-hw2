@@ -4,8 +4,7 @@
 #include <stdlib.h> 
 #include <string.h> 
 #include <sys/socket.h> 
-#define MAX 80 
-#define PORT 8080 
+#define MAX 128 
 #define SA struct sockaddr 
 void func(int sockfd) 
 { 
@@ -45,8 +44,8 @@ int main()
   
     // assign IP, PORT 
   servaddr.sin_family = AF_INET; 
-  servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
-  servaddr.sin_port = htons(PORT); 
+  servaddr.sin_addr.s_addr = inet_addr(arg); 
+  servaddr.sin_port = htons(atoi(argv[2])); 
   
     // connect the client socket to server socket 
   if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) { 
