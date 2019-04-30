@@ -12,7 +12,12 @@
 #include <unistd.h>
 #include <string.h>
 
-void error(const char *);
+void error(const char *msg)
+{
+    perror(msg);
+    exit(0);
+}
+
 int main(int argc, char *argv[])
 {
    int sock, n;
@@ -39,27 +44,27 @@ int main(int argc, char *argv[])
    printf("Enter string: ");
    bzero(buffer,256);
    fgets(buffer,255,stdin);
+
    n=sendto(sock,buffer,
             strlen(buffer),0,(const struct sockaddr *)&server,length);
    if (n < 0) error("Sendto");
    bzero(buffer,256);
    n = recvfrom(sock,buffer,256,0,(struct sockaddr *)&from, &length);
    if (n < 0) error("recvfrom");
-   while(n > 0){
-   		printf("From server: ");
-   		printf("%s\n", buffer);
-   		if(n == 1){ break;}
-   		if(buffer[0] == 'S'){break;}
-   		bzero(buffer,256);
-   		n = recvfrom(sock,buffer,256,0,(struct sockaddr *)&from, &length);
-   		//printf("%d\n", n);
+   if (strcmp(buffer, error_message) == 0)
+        printf("%s\n", buffer);
+   else{
+      while(n > 0){
+                printf("From server: ");
+                printf("%s\n", buffer);
+                if(n == 1){ break;}
+                if(buffer[0] == 'S'){break;}
+                bzero(buffer,256);
+                n = recvfrom(sock,buffer,256,0,(struct sockaddr *)&from, &length);
+      }
    }
+
+   
    close(sock);
    return 0;
-}
-
-void error(const char *msg)
-{
-    perror(msg);
-    exit(0);
 }

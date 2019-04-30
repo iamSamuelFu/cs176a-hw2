@@ -50,24 +50,29 @@ int main(int argc, char *argv[])
     printf("Enter string: ");
     bzero(buffer,256);
     fgets(buffer,256,stdin);
+
     n = send(sockfd,buffer,strlen(buffer),0);
-    if (n < 0) 
+    if (n < 0)
          error("ERROR writing to socket");
     bzero(buffer,256);
     n = recv(sockfd,buffer,256,0);
-    if (n < 0) 
+    if (n < 0)
          error("ERROR reading from socket");
 
-    while(atoi(buffer) > 0){
-    	//printf("%d\n", n);
-   		printf("From server: ");
-   		printf("%s\n", buffer);
-   		//if(strlen(buffer) == 1){ break;}
-   		if(buffer[0] == 'S'){break;}
-   		bzero(buffer,256);
-   		recv(sockfd,buffer,256,0);
-   		//printf("%s\n", buffer);
-   }
+    char *error_message = "Sorry, cannot compute!";
+
+    if (strcmp(buffer, error_message) == 0)
+        printf("%s\n", buffer);
+    else{
+        while(atoi(buffer) > 0){
+            printf("From server: ");
+            printf("%s\n", buffer);
+            if(buffer[0] == 'S'){break;}
+            bzero(buffer,256);
+            recv(sockfd,buffer,256,0);
+        }
+    }
+
     close(sockfd);
     return 0;
 }
