@@ -38,7 +38,7 @@ void func(int sockfd)
 } 
 
 // Driver function 
-int main() 
+int main(int argc, char *argv[]) 
 { 
   int sockfd, connfd, len; 
   struct sockaddr_in servaddr, cli; 

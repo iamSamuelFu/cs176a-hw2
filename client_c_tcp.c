@@ -27,7 +27,7 @@ void func(int sockfd)
   } 
 } 
 
-int main() 
+int main(int argc, char *argv[]) 
 { 
   int sockfd, connfd; 
   struct sockaddr_in servaddr, cli; 
